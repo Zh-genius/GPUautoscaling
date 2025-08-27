@@ -1,0 +1,12 @@
+prometheus:
+  prometheusSpec:
+    serviceMonitorSelector:
+      matchLabels:
+        prometheus: monitor
+
+grafana:
+  enabled: true
+  adminPassword: "admin"
+  service:
+    type: NodePort
+    nodePort: 30000

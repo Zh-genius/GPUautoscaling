@@ -1,0 +1,40 @@
+prometheus:
+  # 修正为实际 Prometheus 服务名称（与 kubectl get svc 结果匹配）
+  url: http://prometheus-stack-kube-prom-prometheus.monitoring.svc.cluster.local
+  port: 9090
+
+rules:
+  default: false  # 关键：禁用默认规则，避免覆盖自定义指标
+  custom:
+    # 规则1：GPU 利用率平均值（AVG）
+    - seriesQuery: 'DCGM_FI_DEV_GPU_UTIL{exported_namespace!="",exported_container!="",exported_pod!=""}'
+      name:
+        as: "DCGM_FI_DEV_GPU_UTIL_AVG"
+      resources:
+        overrides:
+          exported_namespace: {resource: "namespace"}
+          exported_container: {resource: "service"}
+          exported_pod: {resource: "pod"}
+      metricsQuery: avg by (exported_namespace, exported_container) (round(avg_over_time(<<.Series>>[1m])))
+    
+    # 规则2：GPU 利用率最小值（MIN）（补充完整规则，避免"其他规则..."占位符）
+    - seriesQuery: 'DCGM_FI_DEV_GPU_UTIL{exported_namespace!="",exported_container!="",exported_pod!=""}'
+      name:
+        as: "DCGM_FI_DEV_GPU_UTIL_MIN"
+      resources:
+        overrides:
+          exported_namespace: {resource: "namespace"}
+          exported_container: {resource: "service"}
+          exported_pod: {resource: "pod"}
+      metricsQuery: min by (exported_namespace, exported_container) (round(min_over_time(<<.Series>>[1m])))
+    
+    # 规则3：GPU 利用率最大值（MAX）（补充完整规则）
+    - seriesQuery: 'DCGM_FI_DEV_GPU_UTIL{exported_namespace!="",exported_container!="",exported_pod!=""}'
+      name:
+        as: "DCGM_FI_DEV_GPU_UTIL_MAX"
+      resources:
+        overrides:
+          exported_namespace: {resource: "namespace"}
+          exported_container: {resource: "service"}
+          exported_pod: {resource: "pod"}
+      metricsQuery: max by (exported_namespace, exported_container) (round(max_over_time(<<.Series>>[1m])))
