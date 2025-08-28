@@ -18,8 +18,7 @@ The GPU autoscaling system, which automatically scales GPU-enabled workloads in 
 | **GPU Test App**        | Sample application generating GPU load for testing                     |
 
 ## Workflow Diagram
-
-Directory Structure<img width="1188" height="219" alt="work flow" src="https://github.com/user-attachments/assets/5e14b666-50ea-40da-9928-7cfc5f0e2ff8" />
+<img width="848" height="175" alt="workflow2" src="https://github.com/user-attachments/assets/087e82d2-093a-42c1-a34b-aa2c3a96ea18" />
 
 ## Directory Structure
 
