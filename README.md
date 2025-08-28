@@ -22,7 +22,7 @@ The GPU autoscaling system, which automatically scales GPU-enabled workloads in 
 
 ## Directory Structure
 
-
+ ```
 local-gpu-autoscaling/
 ├── clean-prometheus-config.yaml       # Simplified Prometheus scraping config
 ├── dcgm-exporter.yaml                 # DCGM Exporter deployment
@@ -40,7 +40,7 @@ local-gpu-autoscaling/
 │   └── nvidia-device-plugin.yaml      # NVIDIA device plugin
 └── metrics-server/
     └── metrics-server.yaml            # Metrics server deployment
-
+ ```
 
 ## Setup Instructions
 
