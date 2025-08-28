@@ -160,3 +160,53 @@ minikube delete
 - Modify Prometheus scraping interval in `clean-prometheus-config.yaml` (default: 15s)
 - Update GPU resource limits based on your hardware capabilities
 
+# Expected Outcome Flowchart
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         Initial State                                │
+│  ┌─────────────┐    ┌─────────────┐    ┌─────────────┐    ┌─────────┐│
+│  │ GPU App     │    │ GPU Utilization│  │ HPA Config  │    │ Pod     ││
+│  │ (1 replica) │    │ 10%          │    │ Threshold:30%│    │ Replicas││
+│  └─────────────┘    └─────────────┘    └─────────────┘    │ 1       ││
+│                                                           └─────────┘│
+└───────────────────────────┬───────────────────────────────────────────┘
+                            │
+┌───────────────────────────▼───────────────────────────────────────────┐
+│                        Step 1: Increase GPU Load                      │
+│  ┌─────────────┐    ┌─────────────┐    ┌─────────────┐    ┌─────────┐│
+│  │ GPU App     │    │ GPU Utilization│  │ HPA Monitor │    │ Pod     ││
+│  │ (Running    │───▶│ 60%          │───▶│ Detects     │    │ Replicas││
+│  │  workload)  │    │              │    │ threshold   │    │ 1       ││
+│  └─────────────┘    └─────────────┘    │ breach      │    └─────────┘│
+│                                         └─────────────┘              │
+└───────────────────────────┬───────────────────────────────────────────┘
+                            │
+┌───────────────────────────▼───────────────────────────────────────────┐
+│                      Step 2: HPA Triggers Scale Out                   │
+│  ┌─────────────┐    ┌─────────────┐    ┌─────────────┐    ┌─────────┐│
+│  │ Kubernetes  │    │ GPU Utilization│  │ HPA Action  │    │ Pod     ││
+│  │ Schedules   │◀───│ 60%          │◀───│ Scale to 3  │◀───│ Replicas││
+│  │ new Pods    │    │              │    │ replicas    │    │ 3       ││
+│  └─────────────┘    └─────────────┘    └─────────────┘    └─────────┘│
+└───────────────────────────┬───────────────────────────────────────────┘
+                            │
+┌───────────────────────────▼───────────────────────────────────────────┐
+│                    Step 3: Scale In After Load Decreases              │
+│  ┌─────────────┐    ┌─────────────┐    ┌─────────────┐    ┌─────────┐│
+│  │ GPU App     │    │ GPU Utilization│  │ HPA Action  │    │ Pod     ││
+│  │ (Workload   │───▶│ 5%           │───▶│ Scale to 1  │───▶│ Replicas││
+│  │  completed) │    │              │    │ replica     │    │ 1       ││
+│  └─────────────┘    └─────────────┘    └─────────────┘    └─────────┘│
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
+
+ # Verification Outputs  
+   - Real-time HPA status monitoring with `kubectl get hpa gpu-api-hpa -w` should show:
+     ```
+     NAME           REFERENCE               TARGETS   MINPODS   MAXPODS   REPLICAS   AGE
+     gpu-api-hpa    Deployment/gpu-api      60/30     1         3         3          10m
+     gpu-api-hpa    Deployment/gpu-api      5/30      1         3         1          15m
+     ```
+
