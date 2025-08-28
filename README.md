@@ -160,11 +160,3 @@ minikube delete
 - Modify Prometheus scraping interval in `clean-prometheus-config.yaml` (default: 15s)
 - Update GPU resource limits based on your hardware capabilities
 
-
-
-# Optional: Delete Minikube cluster
-minikube delete
-Configuration Notes
-Adjust HPA thresholds in gpu-app/deployment.yaml (default: 30% utilization)
-Modify Prometheus scraping interval in clean-prometheus-config.yaml (default: 15s)
-Update GPU resource limits based on your hardware capabilities
